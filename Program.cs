@@ -14,8 +14,10 @@ namespace _180HzFileWriter
     {
         static void Main(string[] args)
         {
-            int width = 320;
-            int height = 240;
+            int width = 512;
+            int height = 512;
+            double preamblePostamble = 0.5;    // seconds
+            double movieLength = 60.0;    // seconds
 
             VideoFileWriter writer = new VideoFileWriter();
             
@@ -28,7 +30,18 @@ namespace _180HzFileWriter
             SolidBrush brushWhite = new SolidBrush(Color.White);
             SolidBrush brushBlack = new SolidBrush(Color.Black);
 
-            for (int i = 0; i < 180*10; i++)
+            // Preamble
+            for (int i = 0; i < (int)(180 * preamblePostamble); i++)
+            {
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.Clear(Color.Black);
+                    g.Flush();
+                }
+                writer.WriteVideoFrame(bmp);
+            }
+
+            for (int i = 0; i < (int)(180 * movieLength); i++)
             {
                 bmp.SetPixel(i % width, i % height, Color.Blue);
 
@@ -38,13 +51,25 @@ namespace _180HzFileWriter
                     g.SmoothingMode = SmoothingMode.AntiAlias;
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.DrawString(i.ToString(), new Font("Tahoma", 12), Brushes.White, rectText);
+                    g.DrawString(i.ToString(), new Font("Tahoma", 20), Brushes.White, rectText);
 
                     g.FillRectangle(((i & 1) == 0) ? brushWhite : brushBlack, rectBlock);
                     g.Flush();
                 }
                 writer.WriteVideoFrame(bmp);
             }
+
+            // Postamble
+            for (int i = 0; i < (int)(180 * preamblePostamble); i++)
+            {
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.Clear(Color.Black);
+                    g.Flush();
+                }
+                writer.WriteVideoFrame(bmp);
+            }
+
             writer.Close();
 
         }
