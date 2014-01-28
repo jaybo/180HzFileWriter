@@ -14,24 +14,27 @@ namespace _180HzFileWriter
     {
         static void Main(string[] args)
         {
-            int width = 512;
-            int height = 512;
+            int width = 256;
+            int height = 256;
+            int framerate = 60;
+
             double preamblePostamble = 0.5;    // seconds
             double movieLength = 60.0;    // seconds
 
             VideoFileWriter writer = new VideoFileWriter();
+
+            string fname = "test" + framerate.ToString() + ".avi";
+            writer.Open(fname, width, height, framerate, VideoCodec.MPEG4);
             
-            writer.Open("test180.avi", width, height, 180, VideoCodec.MPEG4);
-            
-            RectangleF rectText = new RectangleF(100,100,100,100); 
-            RectangleF rectBlock = new RectangleF(0, 200, 100, 100); 
+            RectangleF rectText = new RectangleF(width/2,0,width/2,height); 
+            RectangleF rectBlock = new RectangleF(0,0,width/2, height); 
             
             Bitmap bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
             SolidBrush brushWhite = new SolidBrush(Color.White);
             SolidBrush brushBlack = new SolidBrush(Color.Black);
 
             // Preamble
-            for (int i = 0; i < (int)(180 * preamblePostamble); i++)
+            for (int i = 0; i < (int)(framerate * preamblePostamble); i++)
             {
                 using (Graphics g = Graphics.FromImage(bmp))
                 {
@@ -41,7 +44,7 @@ namespace _180HzFileWriter
                 writer.WriteVideoFrame(bmp);
             }
 
-            for (int i = 0; i < (int)(180 * movieLength); i++)
+            for (int i = 0; i < (int)(framerate * movieLength); i++)
             {
                 bmp.SetPixel(i % width, i % height, Color.Blue);
 
@@ -60,7 +63,7 @@ namespace _180HzFileWriter
             }
 
             // Postamble
-            for (int i = 0; i < (int)(180 * preamblePostamble); i++)
+            for (int i = 0; i < (int)(framerate * preamblePostamble); i++)
             {
                 using (Graphics g = Graphics.FromImage(bmp))
                 {
